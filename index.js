@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userData from './routes/users.js';
 import auth from './routes/auth.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3300;
@@ -18,6 +19,7 @@ const connect = () => {
 };
 
 app.use(express.json());
+app.use(cookieParser());
 app.use('/api/users', userData);
 app.use('/api/auth', auth);
 

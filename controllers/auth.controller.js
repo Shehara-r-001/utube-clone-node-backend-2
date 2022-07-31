@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import User from '../Modals/User.js';
 import { createError } from '../error.js';
+import jwt from 'jsonwebtoken';
 
 export const SignUp = async (req, res, next) => {
   //   console.log(req.body);
@@ -24,6 +25,15 @@ export const SignIn = async (req, res, next) => {
 
     const isCorrect = await bcrypt.compare(req.body.password, user.password);
     if (!isCorrect) next(createError(400, 'Wrong username or password..!'));
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT);
+    const { password, ...otherDetails } = user._doc;
+    res
+      .cookie('access_token', token, {
+        httpOnly: true,
+      })
+      .status(200)
+      .json(otherDetails);
   } catch (error) {
     next(error);
   }
