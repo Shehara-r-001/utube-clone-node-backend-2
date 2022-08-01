@@ -1,4 +1,5 @@
 import User from '../Modals/User.js';
+import { createError } from '../error.js';
 
 export const updateUser = async (req, res, next) => {
   if (req.params.id === req.user.id) {
@@ -14,16 +15,58 @@ export const updateUser = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-  } else return next(403, 'You do not have access to this account..!');
+  } else
+    return next(createError(403, 'You do not have access to this account..!'));
 };
 
-export const deleteUser = (req, res, next) => {};
+export const deleteUser = async (req, res, next) => {
+  if (req.params.id === req.user.id) {
+    try {
+      await User.findByIdAndDelete(req.params.id);
+      res.status(200).json('User has been deleted..!');
+    } catch (error) {
+      next(error);
+    }
+  } else
+    return next(createError(403, 'You do not have access to this account..!'));
+};
 
-export const getUser = (req, res, next) => {};
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const subUser = (req, res, next) => {};
+export const subUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { subscribedUsers: req.params.id },
+    });
+    await User.findByIdAndUpdate(req.params.id, {
+      $inc: { subscribers: 1 },
+    });
+    res.status(200).json('Successfully subscribed..!');
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const unsubUser = (req, res, next) => {};
+export const unsubUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      $pull: { subscribedUsers: req.params.id },
+    });
+    await User.findByIdAndUpdate(req.params.id, {
+      $inc: { subscribers: -1 },
+    });
+    res.status(200).json('Successfully unsubscribed..!');
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const likeVideo = (req, res, next) => {};
 
