@@ -1,5 +1,6 @@
 import User from '../Modals/User.js';
 import { createError } from '../error.js';
+import Video from '../Modals/Video.js';
 
 export const updateUser = async (req, res, next) => {
   if (req.params.id === req.user.id) {
@@ -68,6 +69,30 @@ export const unsubUser = async (req, res, next) => {
   }
 };
 
-export const likeVideo = (req, res, next) => {};
+export const likeVideo = async (req, res, next) => {
+  const id = req.user.id;
+  const videoID = req.params.videoID;
+  try {
+    await Video.findByIdAndUpdate(videoID, {
+      $addToSet: { likes: id },
+      $pull: { dislikes: id },
+    });
+    res.status(200).json('Video has been liked');
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const dislikeVideo = (req, res, next) => {};
+export const dislikeVideo = async (req, res, next) => {
+  const id = req.user.id;
+  const videoID = req.params.videoID;
+  try {
+    await Video.findByIdAndUpdate(videoID, {
+      $addToSet: { dislikes: id },
+      $pull: { likes: id },
+    });
+    res.status(200).json('Video has been disliked');
+  } catch (error) {
+    next(error);
+  }
+};
