@@ -100,3 +100,26 @@ export const subVideos = async (req, res, next) => {
     next(error);
   }
 };
+
+export const videosByTags = async (req, res, next) => {
+  const tags = req.query.tags.split(',');
+  // console.log(tags);
+  try {
+    const videos = await Video.find({ tags: { $in: tags } }).limit(20);
+    res.status(200).json(videos);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const searchVideos = async (req, res, next) => {
+  const searchText = req.query.q;
+  try {
+    const videos = await Video.find({
+      title: { $regex: searchText, $options: 'i' },
+    }).limit(40);
+    res.status(200).json(videos);
+  } catch (error) {
+    next(error);
+  }
+};

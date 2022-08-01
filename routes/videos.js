@@ -4,9 +4,11 @@ import {
   deleteVideo,
   getVideo,
   randomVideos,
+  searchVideos,
   subVideos,
   trendingVideos,
   updateVideo,
+  videosByTags,
 } from '../controllers/video.controller.js';
 import { verifyToken } from '../verifyToken.js';
 
@@ -27,5 +29,9 @@ router.get('/trending', trendingVideos);
 router.get('/random', randomVideos);
 
 router.get('/sub', verifyToken, subVideos);
+
+router.get('/tags', videosByTags);
+
+router.get('/search', searchVideos);
 
 export default router;
